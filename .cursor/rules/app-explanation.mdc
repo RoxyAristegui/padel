@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Toda la aplicación debe estar escrita en Laravel, y las interfaces se generan con Vue.js y el css aplicado mediante tailwind. La base de la aplicación trata de usuarios que se registran, y pertenecen a un equipo. El equipo está regido por un administrador, que decide cuáles son los usuarios que pertenen a su equipo y crea partidos. Cada vez que se abre un partido, se inicia una list para que los demás usuarios se apunten su disponibilidad, es decir, tienen que marcar "disponible" o "no dispnible". Cada usuario verá solamente su respuesta a ese partido, pero el administrador verá las respuestas de todos los usuarios. Pasado un tiempo, el adminsitrador podrá cerrar el partido, donde nadie mas podrá apuntar su disponibilidad.
+
