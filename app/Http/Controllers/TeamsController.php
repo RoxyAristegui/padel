@@ -93,7 +93,7 @@ class TeamsController extends Controller
             }
             $emails_procesados->push($email);
         }
-        dd($emails_procesados);
+        // dd($emails_procesados);
         if($errors->isNotEmpty()){
         
             return back()->withErrors($errors);

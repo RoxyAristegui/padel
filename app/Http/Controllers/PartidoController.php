@@ -11,6 +11,8 @@ use Inertia\Inertia;
 use App\Models\PartidoDisponible;
 use Illuminate\Support\Facades\DB;
 use App\Models\PartidoConvocada;
+use App\Models\User;
+use App\Models\Team;
 
 class PartidoController extends Controller
 {
@@ -50,7 +52,7 @@ class PartidoController extends Controller
     {
         $partido=Partido::find($partidoId);
 
-       // Gate::authorize('view', $partido);
+        Gate::authorize('view', $partido);
         $user = $request->user();
         $isAdmin = $user->isAdmin($partido->team);
 
@@ -85,7 +87,7 @@ class PartidoController extends Controller
      */
     public function create(Request $request)
     {
-        // Gate::authorize('createPartido', Jetstream::newTeamModel());
+        Gate::authorize('create', Partido::class);
 
         return Inertia::render('Partidos/Create');
     }
@@ -229,4 +231,22 @@ public function update(Request $request, $partidoId)
     $partido->save();
     return back();
 }
+
+    public function estadisticas(Request $request)
+    {
+        $user = $request->user();
+        $team = $user->currentTeam;
+        $miembros = $team->users;
+        $partidos = $team->partidos;
+        $jugadores = [];
+        $totalPartidos = $partidos->count();
+        foreach ($miembros as $jugador) {
+            $jugadores[] = $jugador->estadisticas($team);
+        }
+     
+        return Inertia::render('Estadisticas', [
+            'partidos_disponutados'=> $totalPartidos,
+            'jugadores' => $jugadores,
+        ]);
+    }
 }

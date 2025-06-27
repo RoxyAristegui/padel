@@ -54,6 +54,9 @@ const logout = () => {
                                 <NavLink :href="route('partidos.list')" :active="route().current('partidos.list')">
                                     Partidos
                                 </NavLink>
+                                <NavLink :href="route('estadisticas')" :active="route().current('estadisticas')">
+                                    Estadísticas
+                                </NavLink>
                             </div>
                         </div>
 
@@ -206,6 +209,9 @@ const logout = () => {
                         </ResponsiveNavLink>
                         <ResponsiveNavLink :href="route('partidos.list')" :active="route().current('partidos.list')">
                             Partidos
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('estadisticas')" :active="route().current('estadisticas')">
+                            Estadísticas
                         </ResponsiveNavLink>
                     </div>
 

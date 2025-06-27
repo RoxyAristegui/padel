@@ -32,6 +32,9 @@ class CreateTeam implements CreatesTeams
             'personal_team' => false,
         ]));
 
+        // Añadir al owner como miembro del equipo (team_user)
+        $team->users()->attach($user, ['role' => 'admin']);
+
         return $team;
     }
 }

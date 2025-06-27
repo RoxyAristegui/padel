@@ -71,4 +71,26 @@ class User extends Authenticatable
     {
         return $this->hasTeamRole($team, 'Administrator');
     }
+
+    public function estadisticas($team){
+     $partidos = $team->partidos;
+        $totalPartidos = $partidos->count();
+            $disponibles = PartidoDisponible::where('user_id', $this->id)
+                ->whereIn('partido_id', $partidos->pluck('id'))
+                ->where('disponible', true)
+                ->count();
+            $convocados = PartidoConvocada::where('user_id', $this->id)
+                ->whereIn('partido_id', $partidos->pluck('id'))
+                ->count();
+            $porcentaje_disponible = $totalPartidos > 0 ? round(($disponibles / $totalPartidos) * 100, 1) : 0;
+            $porcentaje_convocado = $disponibles > 0 ? round(($convocados / $disponibles) * 100, 1) : 0;
+            return [
+                'id' => $this->id,
+                'name' => $this->name,
+                'porcentaje_disponible' => $porcentaje_disponible,
+                'porcentaje_convocado' => $porcentaje_convocado,
+            ];
+    
+    }
+
 }

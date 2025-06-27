@@ -52,4 +52,25 @@ class Team extends JetstreamTeam
     {
         return $this->hasMany(Partido::class);
     }
+
+    // public function userStats($jugador){
+    //  $partidos = $this->partidos;
+    //     $totalPartidos = $partidos->count();
+    //         $disponibles = PartidoDisponible::where('user_id', $jugador->id)
+    //             ->whereIn('partido_id', $partidos->pluck('id'))
+    //             ->where('disponible', true)
+    //             ->count();
+    //         $convocados = PartidoConvocada::where('user_id', $jugador->id)
+    //             ->whereIn('partido_id', $partidos->pluck('id'))
+    //             ->count();
+    //         $porcentaje_disponible = $totalPartidos > 0 ? round(($disponibles / $totalPartidos) * 100, 1) : 0;
+    //         $porcentaje_convocado = $disponibles > 0 ? round(($convocados / $disponibles) * 100, 1) : 0;
+    //         return [
+    //             'id' => $jugador->id,
+    //             'name' => $jugador->name,
+    //             'porcentaje_disponible' => $porcentaje_disponible,
+    //             'porcentaje_convocado' => $porcentaje_convocado,
+    //         ];
+    
+    // }
 }

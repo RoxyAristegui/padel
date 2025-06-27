@@ -47,4 +47,5 @@ Route::post('/partido/{partido}/convocar', [PartidoController::class, 'convocar'
 
 Route::post('/teams/{team}/add-users-excel', [TeamsController::class, 'addUsers'])->name('teams.add-users-excel');
 Route::get('/teams/{team}/putoexcel', [TeamsController::class, 'addUsers']);
+Route::get('/estadisticas', [PartidoController::class, 'estadisticas'])->name('estadisticas');
 });
