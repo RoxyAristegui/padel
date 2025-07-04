@@ -1,13 +1,17 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
+import axios from 'axios';
 
 const props = defineProps({
     show: Boolean,
-    disponibles: Array,         // [{ user: { id, name }, disponible: true }]
-    noDisponibles: Array,       // [{ user: { id, name }, disponible: false }]
+    partidoId: Number, // Cambiamos a recibir solo el id del partido
     convocadosIniciales: Array  // [user_id, ...]
 });
 const emit = defineEmits(['close', 'finalizar']);
+
+const disponibles = ref([]);
+const noDisponibles = ref([]);
+const loading = ref(false);
 
 const seleccionados = ref([]);
 
@@ -19,12 +23,20 @@ const seleccionadosCountClass = computed(() =>
 
 watch(
     () => props.show,
-    (val) => {
+    async (val) => {
         if (val) {
-            if (props.convocadosIniciales && props.convocadosIniciales.length > 0) {
-                seleccionados.value = [...props.convocadosIniciales];
-            } else {
-                seleccionados.value = props.disponibles.map(d => d.user.id);
+            loading.value = true;
+            try {
+                const res = await axios.get(`/partido/${props.partidoId}/disponibles-con-estadisticas`);
+                disponibles.value = res.data.disponibles;
+                noDisponibles.value = res.data.noDisponibles;
+                if (props.convocadosIniciales && props.convocadosIniciales.length > 0) {
+                    seleccionados.value = [...props.convocadosIniciales];
+                } else {
+                    seleccionados.value = disponibles.value.map(d => d.user.id);
+                }
+            } finally {
+                loading.value = false;
             }
         }
     },
@@ -48,17 +60,40 @@ const showMasJugadores = ref(false);
             </button>
             <h3 class="font-semibold text-lg mb-4 text-green-700">Selecciona los jugadores a convocar</h3>
             <form @submit.prevent="finalizar">
-                <div class="max-h-60 overflow-y-auto mb-4">
-                    <div v-for="disp in disponibles" :key="disp.user.id" class="flex items-center gap-2 mb-2">
-                        <input
-                            type="checkbox"
-                            :id="'convocado-' + disp.user.id"
-                            :value="disp.user.id"
-                            v-model="seleccionados"
-                            class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
-                        />
-                        <label :for="'convocado-' + disp.user.id" class="text-gray-700">{{ disp.user.name }}</label>
-                    </div>
+                <div v-if="loading" class="text-center text-gray-400 mb-4">Cargando jugadores...</div>
+                <div v-else class="max-h-60 overflow-y-auto mb-4">
+                    <table class="min-w-full text-xs">
+                        <thead>
+                            <tr>
+                                <th class="px-2 py-1 text-left">Convocar</th>
+                                <th class="px-2 py-1 text-left">Nombre</th>
+                                <th class="px-2 py-1 text-left">% Disp.</th>
+                                <th class="px-2 py-1 text-left">% Conv.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="disp in disponibles" :key="disp.user.id">
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        :id="'convocado-' + disp.user.id"
+                                        :value="disp.user.id"
+                                        v-model="seleccionados"
+                                        class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                    />
+                                </td>
+                                <td>
+                                    <label :for="'convocado-' + disp.user.id" class="text-gray-700">{{ disp.user.name }}</label>
+                                </td>
+                                <td>
+                                    <span v-if="disp.user.estadisticas">{{ disp.user.estadisticas.porcentaje_disponible }}%</span>
+                                </td>
+                                <td>
+                                    <span v-if="disp.user.estadisticas">{{ disp.user.estadisticas.porcentaje_convocado }}%</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <!-- Más jugadores (no disponibles) -->
                 <div>
@@ -73,17 +108,39 @@ const showMasJugadores = ref(false);
                         </svg>
                     </button>
                     <div v-if="showMasJugadores" class="max-h-40 overflow-y-auto border-t pt-2">
+                        <table class="min-w-full text-xs">
+                            <thead>
+                                <tr>
+                                    <th class="px-2 py-1 text-left">Convocar</th>
+                                    <th class="px-2 py-1 text-left">Nombre</th>
+                                    <th class="px-2 py-1 text-left">% Disp.</th>
+                                    <th class="px-2 py-1 text-left">% Conv.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="disp in noDisponibles" :key="disp.user.id">
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            :id="'convocado-no-' + disp.user.id"
+                                            :value="disp.user.id"
+                                            v-model="seleccionados"
+                                            class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                        />
+                                    </td>
+                                    <td>
+                                        <label :for="'convocado-no-' + disp.user.id" class="text-gray-700">{{ disp.user.name }}</label>
+                                    </td>
+                                    <td>
+                                        <span v-if="disp.user.estadisticas">{{ disp.user.estadisticas.porcentaje_disponible }}%</span>
+                                    </td>
+                                    <td>
+                                        <span v-if="disp.user.estadisticas">{{ disp.user.estadisticas.porcentaje_convocado }}%</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <div v-if="noDisponibles.length === 0" class="text-gray-400 text-sm">No hay más jugadores.</div>
-                        <div v-for="disp in noDisponibles" :key="disp.user.id" class="flex items-center gap-2 mb-2">
-                            <input
-                                type="checkbox"
-                                :id="'convocado-no-' + disp.user.id"
-                                :value="disp.user.id"
-                                v-model="seleccionados"
-                                class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
-                            />
-                            <label :for="'convocado-no-' + disp.user.id" class="text-gray-700">{{ disp.user.name }}</label>
-                        </div>
                     </div>
                 </div>
                 <!-- Contador de seleccionados -->

@@ -22,7 +22,7 @@ const crearPartido = () => {
                     <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h2a4 4 0 014 4v2M7 7a4 4 0 018 0v4a4 4 0 01-8 0V7z" />
                     </svg>
-                    Listado de Partidos
+                    Partidos
                 </h2>
                 <PrimaryButton v-if="isAdmin" @click="crearPartido">
                     Nuevo Partido

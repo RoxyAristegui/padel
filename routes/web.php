@@ -44,6 +44,7 @@ Route::middleware([
 Route::post('/partido/{partido}/disponibilidad', [PartidoController::class, 'marcarDisponibilidad'])->name('partido.disponibilidad');
 Route::post('/partido/{partido}/completar', [PartidoController::class, 'completar'])->name('partido.cerrar');
 Route::post('/partido/{partido}/convocar', [PartidoController::class, 'convocar'])->name('partido.convocar');
+Route::get('/partido/{partido}/disponibles-con-estadisticas', [PartidoController::class, 'disponiblesConEstadisticas'])->name('partido.disponibles-estadisticas');
 
 Route::post('/teams/{team}/add-users-excel', [TeamsController::class, 'addUsers'])->name('teams.add-users-excel');
 Route::get('/teams/{team}/putoexcel', [TeamsController::class, 'addUsers']);

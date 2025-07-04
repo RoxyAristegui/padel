@@ -249,4 +249,38 @@ public function update(Request $request, $partidoId)
             'jugadores' => $jugadores,
         ]);
     }
+
+    public function disponiblesConEstadisticas(Request $request, $partidoId)
+    {
+        $user = $request->user();
+        $partido = \App\Models\Partido::with('team')->findOrFail($partidoId);
+        $team = $partido->team;
+        $miembros = $team->users;
+        if (!$miembros->contains('id', $team->owner_id)) {
+            $miembros->push($team->owner);
+        }
+        $disponibles = [];
+        $noDisponibles = [];
+        foreach ($miembros as $jugador) {
+            $estadisticas = method_exists($jugador, 'estadisticas') ? $jugador->estadisticas($team) : null;
+            $disponibilidad = $partido->disponibilidades->firstWhere('user_id', $jugador->id);
+            $item = [
+                'user' => [
+                    'id' => $jugador->id,
+                    'name' => $jugador->name,
+                    'estadisticas' => $estadisticas,
+                ],
+                'disponible' => $disponibilidad ? (bool)$disponibilidad->disponible : false,
+            ];
+            if ($item['disponible']) {
+                $disponibles[] = $item;
+            } else {
+                $noDisponibles[] = $item;
+            }
+        }
+        return response()->json([
+            'disponibles' => $disponibles,
+            'noDisponibles' => $noDisponibles,
+        ]);
+    }
 }

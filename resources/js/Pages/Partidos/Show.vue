@@ -25,19 +25,7 @@ const cerrarPartido = () => {
 
 // --- Convocar jugadores ---
 const showModal = ref(false);
-const disponibles = computed(() =>
-    props.disponibilidades ? props.disponibilidades.filter(d => d.disponible) : []
-);
-const disponiblesIds = computed(() => disponibles.value.map(d => d.user.id));
 
-// Miembros que no están en disponibles
-const noDisponibles = computed(() =>
-    props.miembrosEquipo
-        ? props.miembrosEquipo
-            .filter(m => !disponiblesIds.value.includes(m.id))
-            .map(m => ({ user: m }))
-        : []
-);
 const convocadosIds = computed(() =>
     props.convocados ? props.convocados.map(c => c.user_id) : []
 );
@@ -243,9 +231,9 @@ const submitEdit = () => {
 
                 <!-- Modal de convocatoria -->
                 <ConvocarModal
+                    v-if="showModal"
                     :show="showModal"
-                    :disponibles="disponibles"
-                    :no-disponibles="noDisponibles"
+                    :partido-id="partido.id"
                     :convocados-iniciales="convocadosIds"
                     @close="showModal = false"
                     @finalizar="cerrarConvocatoria"

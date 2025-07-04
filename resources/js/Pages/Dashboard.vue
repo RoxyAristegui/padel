@@ -6,6 +6,9 @@ import MarcarDisponibilidad from './Partidos/Partials/MarcarDisponibilidad.vue';
 import { usePage } from '@inertiajs/vue3'
 // Heroicons imports
 import { CalendarDaysIcon, ClockIcon, MapPinIcon, UsersIcon } from '@heroicons/vue/24/outline';
+ import dayjs from 'dayjs';
+import 'dayjs/locale/es';
+dayjs.locale('es');
 
 const page = usePage();
 const props = defineProps({
@@ -41,6 +44,11 @@ const estado = computed(() => {
     }
 });
 
+const diaSemana = computed(() => {
+    if (!props.partido || !props.partido.fecha) return '';
+    return dayjs(props.partido.fecha).locale('es').format('dddd');
+});
+
 function irAPartido() {
     if (props.partido) {
         router.visit(`/partido/${props.partido.id}`);
@@ -50,11 +58,11 @@ function irAPartido() {
 
 <template>
     <AppLayout title="Dashboard">
-        <template #header>
+        <!-- <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Dashboard
             </h2>
-        </template>
+        </template> -->
 
         <div class="py-6 sm:py-12">
             <div class="max-w-2xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -80,6 +88,7 @@ function irAPartido() {
                                 <div class="flex flex-col items-center">
                                     <CalendarDaysIcon class="w-7 h-7 text-blue-500 mb-1" />
                                     <span class="text-xs text-gray-500 font-semibold">Fecha</span>
+                                    <span class="text-xs text-gray-400 font-semibold">{{ diaSemana }}</span>
                                     <span class="text-blue-700 text-sm font-bold">{{ partido.fecha }}</span>
                                 </div>
                                 <div class="flex flex-col items-center">
